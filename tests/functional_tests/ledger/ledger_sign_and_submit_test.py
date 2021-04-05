@@ -1,6 +1,6 @@
 import json
 
-from indy import did, ledger, pool
+from indy import signus, ledger
 import pytest
 
 from utilities import common, constant
@@ -13,19 +13,17 @@ class TestSignAndSubmitRequest(TestScenarioBase):
 
     @pytest.mark.asyncio
     async def test(self):
-        await  pool.set_protocol_version(2)
-
         # 1. Prepare pool and wallet. Get pool_handle, wallet_handle
         self.steps.add_step("Prepare pool and wallet")
         self.pool_handle, self.wallet_handle = \
             await perform(self.steps, common.prepare_pool_and_wallet,
-                          self.pool_name, self.wallet_name, self.wallet_credentials,
+                          self.pool_name, self.wallet_name,
                           self.pool_genesis_txn_file)
 
         # 2. Create and store did
         self.steps.add_step("Create DID")
         (submitter_did, _) = \
-            await perform(self.steps, did.create_and_store_my_did,
+            await perform(self.steps, signus.create_and_store_my_did,
                           self.wallet_handle,
                           json.dumps({"seed": constant.seed_default_trustee}))
 
@@ -34,7 +32,7 @@ class TestSignAndSubmitRequest(TestScenarioBase):
         self.steps.add_step("Create target")
         (target_did, _) = await perform(
                                         self.steps,
-                                        did.create_and_store_my_did,
+                                        signus.create_and_store_my_did,
                                         self.wallet_handle,
                                         json.dumps({"seed": seed_trustee_2}))
 
